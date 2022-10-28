@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import Pagination from "@mui/material/Pagination";
+
 import ReactPaginate from 'react-paginate';
-import Stack from "@mui/material/Stack";
+
 import cogoToast from "cogo-toast";
 import Loading from "./Loading";
 import axios from "axios";
@@ -11,8 +11,10 @@ const ProductDetails = () => {
   const [row, setRow] = useState([]);
   const [total, setTotal] = useState({});
   const [searchkeyword, setSearchkeyword] = useState(0);
-  const [perpage, setPerpage] = useState(50);
-//   const [total, setTotal] = useState({});
+  const [perpage, setPerpage] = useState(5);
+ 
+
+
 
   // api fetch
 
@@ -45,19 +47,52 @@ const ProductDetails = () => {
   };
 
   useEffect(() => {
-    // setLoading(true);
+    setLoading(true);
     fetchApi(1,perpage,searchkeyword);
    
-  }, []);
+  }, [perpage,searchkeyword]);
 
   const {count}=total;
+
+  // console.log(row);
+  // console.log(count);
+
+  const handlePageClick=(event)=>{
+
+    let currentPage=event.selected+1;
+    // setPageNo(currentPage)
+    setLoading(true);
+    fetchApi(currentPage,perpage,searchkeyword)
+
+  }
+
+  const perPageHandler=(e)=>{
+    setPerpage(parseInt(e.target.value))
+    // setLoading(true);
+    // fetchApi(1,perpage,searchkeyword)
+
+  }
+
+  // searching
+
+  const onChangeHandler= (e)=>{
+    setSearchkeyword(e.target.value)
+    // setLoading(true);
+    fetchApi(1,perpage,searchkeyword)
+
+  }
+
+  const handleClick =()=>{
+    fetchApi(1,perpage,searchkeyword)
+    setSearchkeyword(0)
+  }
   
 
   return (
     <>
       <Loading loading={loading} />
 
-      <div className=" w-[80%] bg-white shadow-lg mx-auto mt-32 rounded-md">
+      <div className=" w-[80%] bg-white shadow-lg mx-auto mt-12 rounded-md">
         <div className=" flex items-center justify-between p-4">
           <h1 className=" text-3xl font-semibold text-zinc-600">
             Product List{" "}
@@ -67,6 +102,7 @@ const ProductDetails = () => {
               className=" px-6 py-1 bg-transparent border-fuchsia-700 text-zinc-600"
               name=""
               id=""
+              onChange={perPageHandler}
             >
               <option value="5"> 5 per page</option>
               <option value="10"> 10 per page</option>
@@ -82,14 +118,15 @@ const ProductDetails = () => {
               className=" outline-none text-zinc-600 "
               type="text"
               placeholder="Search "
+              onChange={onChangeHandler}
             />
-            <button>
-              <FaSearch className=" text-fuchsia-700" />
+            <button onClick={handleClick}>
+              <FaSearch className=" text-fuchsia-700 " />
             </button>
           </div>
         </div>
         <div className=" pt-8 pb-3">
-          <table class=" table-auto w-[92%] mx-auto">
+          <table className=" table-auto w-[92%] mx-auto">
             <thead className=" border-b border-gray-300 bg-gray-50 text-left mb-3 text-zinc-600">
               <tr className="">
                 <th className=" p-3 font-semibold text-base tracking-wide">
@@ -149,19 +186,27 @@ const ProductDetails = () => {
           </table>
         </div>
         <div className=" my-4 ml-4">
-        {/* <ReactPaginate
+       
+        <ReactPaginate
         breakLabel="..."
         previousLabel="< "
         nextLabel=" >"
-        // onPageChange={handlePageClick}
-        pageRangeDisplayed={5}
-        pageCount={()=>count/10}
+        onPageChange={handlePageClick}
+        containerClassName=" flex item-center gap-6 py-6 px-5" 
+        pageClassName=" px-3 py-1 border border-fuchsia-700  rounded-full text-fuchsia-700  hover:bg-transparent
+         hover:bg-fuchsia-700 hover:text-white"
+        pageLinkClassName="cursor-pointer "
+        activeClassName=' bg-fuchsia-700 text-white'
+        previousClassName=" text-xl text-fuchsia-700"
+        nextClassName=" text-xl text-fuchsia-700"
+        breakClassName=" text-lg text-fuchsia-700"
+        pageRangeDisplayed={2}
+        pageCount={Math.ceil(count/perpage)}
+        marginPagesDisplayed={2}
         
-        renderOnZeroPageCount={null}
-      /> */}
-          <Stack spacing={2} className="my-4">
-            <Pagination count={(count/10)}  color="secondary" />
-          </Stack>
+       
+      />
+          
         </div>
       </div>
     </>
